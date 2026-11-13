@@ -1,0 +1,277 @@
+{
+  "document_type": "lab_report",
+  "laboratory": {
+    "name": null,
+    "address": null,
+    "telephone": null,
+    "fax": null
+  },
+  "patient": {
+    "name": null,
+    "age": null,
+    "gender": null
+  },
+  "report": {
+    "date": null,
+    "physician": null,
+    "accession_number": null
+  },
+  "sections": {
+    "blood_biochemistry": [
+      {
+        "test_name": "LDL Cholesterol",
+        "test_name_fa": null,
+        "result": "105",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "130",
+          "text": "<130"
+        },
+        "original_text": "LDL Cholesterol 105 High mg/dL <130"
+      },
+      {
+        "test_name": "HDL Cholesterol",
+        "test_name_fa": null,
+        "result": "65",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": "40",
+          "high": null,
+          "text": ">40"
+        },
+        "original_text": "HDL Cholesterol 65 mg/dL >40"
+      },
+      {
+        "test_name": "VLDL Cholesterol",
+        "test_name_fa": null,
+        "result": "14",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "30",
+          "text": "<30"
+        },
+        "original_text": "VLDL Cholesterol 14 mg/dL <30"
+      },
+      {
+        "test_name": "Cholesterol, Total",
+        "test_name_fa": null,
+        "result": "245",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "200",
+          "text": "<200"
+        },
+        "original_text": "Cholesterol, Total 245 High mg/dL <200"
+      },
+      {
+        "test_name": "Triglycerides",
+        "test_name_fa": null,
+        "result": "36",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "150",
+          "text": "<150"
+        },
+        "original_text": "Triglycerides 36 mg/dL <150"
+      },
+      {
+        "test_name": "Non HDL Chol. (LDL+VLDL)",
+        "test_name_fa": null,
+        "result": "199",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "160",
+          "text": "<160"
+        },
+        "original_text": "Non HDL Chol. (LDL+VLDL) 199 High mg/dL <160"
+      },
+      {
+        "test_name": "apoB:100-calc",
+        "test_name_fa": null,
+        "result": "120",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "109",
+          "text": "<109"
+        },
+        "original_text": "apoB:100-calc 120 High mg/dL <109"
+      },
+      {
+        "test_name": "LDL-p (Real)-C",
+        "test_name_fa": null,
+        "result": "146",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "100",
+          "text": "<100"
+        },
+        "original_text": "LDL-p (Real)-C 146 High mg/dL <100"
+      },
+      {
+        "test_name": "Lp(a) Cholesterol",
+        "test_name_fa": null,
+        "result": "15.0",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "10",
+          "text": "<10"
+        },
+        "original_text": "Lp(a) Cholesterol 15.0 High mg/dL <10"
+      },
+      {
+        "test_name": "IDL Cholesterol",
+        "test_name_fa": null,
+        "result": "4",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "20",
+          "text": "<20"
+        },
+        "original_text": "IDL Cholesterol 4 mg/dL <20"
+      },
+      {
+        "test_name": "Remnant Lipo. (IDL+VLDL3)",
+        "test_name_fa": null,
+        "result": "11",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "30",
+          "text": "<30"
+        },
+        "original_text": "Remnant Lipo. (IDL+VLDL3) 11 mg/dL <30"
+      },
+      {
+        "test_name": "Probable Metabolic Syndrome",
+        "test_name_fa": null,
+        "result": "No",
+        "unit": null,
+        "reference_range": {
+          "low": null,
+          "high": null,
+          "text": null
+        },
+        "original_text": "Probable Metabolic Syndrome No No"
+      },
+      {
+        "test_name": "HDL-2 (Most Protective)",
+        "test_name_fa": null,
+        "result": "16",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": "15",
+          "high": null,
+          "text": ">15"
+        },
+        "original_text": "HDL-2 (Most Protective) 16 mg/dL >15"
+      },
+      {
+        "test_name": "HDL-3 (Less Protective)",
+        "test_name_fa": null,
+        "result": "50",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": "25",
+          "high": null,
+          "text": ">25"
+        },
+        "original_text": "HDL-3 (Less Protective) 50 mg/dL >25"
+      },
+      {
+        "test_name": "VLDL-1 (Small Remnant)",
+        "test_name_fa": null,
+        "result": "7",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": "10",
+          "text": "<10"
+        },
+        "original_text": "VLDL-1 (Small Remnant) 7 mg/dL <10"
+      },
+      {
+        "test_name": "LDL1: Pattern A",
+        "test_name_fa": null,
+        "result": "5.2",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": null,
+          "text": null
+        },
+        "original_text": "LDL1: Pattern A 5.2 mg/dL"
+      },
+      {
+        "test_name": "LDL2 Pattern A",
+        "test_name_fa": null,
+        "result": "16.2",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": null,
+          "text": null
+        },
+        "original_text": "LDL2 Pattern A 16.2 mg/dL"
+      },
+      {
+        "test_name": "LDL3 Pattern B",
+        "test_name_fa": null,
+        "result": "92.0",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": null,
+          "text": null
+        },
+        "original_text": "LDL3 Pattern B 92.0 mg/dL"
+      },
+      {
+        "test_name": "LDL4 Pattern B",
+        "test_name_fa": null,
+        "result": "12.7",
+        "unit": "mg/dL",
+        "reference_range": {
+          "low": null,
+          "high": null,
+          "text": null
+        },
+        "original_text": "LDL4 Pattern B 12.7 mg/dL"
+      },
+      {
+        "test_name": "LDL Density Pattern",
+        "test_name_fa": null,
+        "result": "A",
+        "unit": null,
+        "reference_range": {
+          "low": null,
+          "high": null,
+          "text": null
+        },
+        "original_text": "LDL Density Pattern A A"
+      }
+    ],
+    "hematology": [],
+    "urine_analysis": [],
+    "other": []
+  },
+  "blood_type": {
+    "abo": null,
+    "rh": null
+  },
+  "additional_information": [
+    "[ ] [ ] * [ ] Pattern B Pattern A Small, Dense LDL A/B Large Buoyant LDL"
+  ],
+  "_metadata": {
+    "source_ocr_file": "document_2",
+    "model": "gemini-2.5-flash"
+  }
+}

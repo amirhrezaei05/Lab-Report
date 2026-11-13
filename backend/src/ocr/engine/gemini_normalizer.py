@@ -1,0 +1,355 @@
+import sys
+import os
+import json
+import urllib.request
+import urllib.error
+from pathlib import Path
+
+
+# ============================================================
+# Configuration
+# ============================================================
+
+def _api_key() -> str:
+    key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if key:
+        return key.strip()
+    key_file = Path.home() / "API_key.txt"
+    if key_file.is_file():
+        return key_file.read_text(encoding="utf-8").strip()
+    raise RuntimeError(
+        "Gemini API key not configured. Set GEMINI_API_KEY or place it in ~/API_key.txt."
+    )
+
+
+DEFAULT_MODEL = "gemini-2.5-flash"
+
+
+# ============================================================
+# Normalization Prompt
+# ============================================================
+
+PROMPT = """
+You are a medical laboratory report data normalization system.
+
+You will receive raw OCR text from a medical laboratory report.
+
+Your task is to convert the OCR text into a structured JSON object.
+
+IMPORTANT RULES:
+
+1. Preserve all information present in the OCR.
+2. Do NOT diagnose the patient.
+3. Do NOT interpret medical significance.
+4. Do NOT decide whether a result is normal or abnormal.
+5. Do NOT add information that is not present.
+6. Do NOT guess missing information.
+7. Use null for missing information.
+8. Preserve the original test names.
+9. Preserve Persian test names when present.
+10. Preserve units exactly as they appear.
+11. Preserve reference ranges.
+12. Separate result values from units.
+13. Preserve qualitative results such as Positive, Negative, Moderate, etc.
+14. Preserve laboratory departments/sections.
+15. Preserve blood group and Rh factor.
+16. Preserve dates exactly as they appear.
+17. Do not convert Persian dates to Gregorian dates.
+18. Do not silently correct OCR errors.
+19. Keep the original OCR fragment for each test in "original_text".
+20. Return ONLY valid JSON.
+21. Do NOT use Markdown.
+22. Do NOT provide explanations.
+
+Use this JSON structure:
+
+{
+  "document_type": "lab_report",
+
+  "laboratory": {
+    "name": null,
+    "address": null,
+    "telephone": null,
+    "fax": null
+  },
+
+  "patient": {
+    "name": null,
+    "age": null,
+    "gender": null
+  },
+
+  "report": {
+    "date": null,
+    "physician": null,
+    "accession_number": null
+  },
+
+  "sections": {
+    "blood_biochemistry": [],
+    "hematology": [],
+    "urine_analysis": [],
+    "other": []
+  },
+
+  "blood_type": {
+    "abo": null,
+    "rh": null
+  },
+
+  "additional_information": []
+}
+
+Each laboratory test should use:
+
+{
+  "test_name": null,
+  "test_name_fa": null,
+  "result": null,
+  "unit": null,
+  "reference_range": {
+    "low": null,
+    "high": null,
+    "text": null
+  },
+  "original_text": null
+}
+
+If a reference range cannot be represented numerically,
+preserve it in "text".
+
+For example:
+
+">30"
+
+should become:
+
+{
+  "low": null,
+  "high": null,
+  "text": ">30"
+}
+
+Do not invent values.
+
+RAW OCR TEXT:
+"""
+
+
+# ============================================================
+# Gemini Normalization
+# ============================================================
+def normalize(ocr_data: dict, model: str = DEFAULT_MODEL) -> dict:
+
+    if not isinstance(ocr_data, dict):
+        raise TypeError(
+            "ocr_data must be a dictionary."
+        )
+
+    if "text" not in ocr_data:
+        raise ValueError(
+            "OCR data does not contain a 'text' field."
+        )
+
+    ocr_text = ocr_data["text"]
+
+    if not isinstance(ocr_text, str):
+        raise TypeError(
+            "OCR 'text' field must be a string."
+        )
+
+    if not ocr_text.strip():
+        raise ValueError(
+            "OCR data contains an empty 'text' field."
+        )
+    # Build prompt
+    # --------------------------------------------------------
+
+    prompt = PROMPT + "\n" + ocr_text
+
+    # --------------------------------------------------------
+    # Vertex AI request
+    # --------------------------------------------------------
+
+    body = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": prompt
+                    }
+                ]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0,
+            "responseMimeType": "application/json"
+        }
+    }
+
+    url = (
+        "https://aiplatform.googleapis.com/v1/"
+        "publishers/google/models/"
+        f"{model}:generateContent"
+    )
+
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(body).encode("utf-8"),
+        headers={
+            "x-goog-api-key": _api_key(),
+            "content-type": "application/json",
+        },
+        method="POST",
+    )
+
+    # --------------------------------------------------------
+    # Send request
+    # --------------------------------------------------------
+
+    try:
+
+        with urllib.request.urlopen(
+            request,
+            timeout=180
+        ) as response:
+
+            result = json.load(response)
+
+    except urllib.error.HTTPError as exc:
+
+        error_body = exc.read().decode(
+            "utf-8",
+            errors="replace"
+        )
+
+        raise RuntimeError(
+            f"Gemini API error {exc.code}: "
+            f"{error_body[:1000]}"
+        ) from exc
+
+    except urllib.error.URLError as exc:
+
+        raise RuntimeError(
+            f"Could not connect to Gemini API: {exc}"
+        ) from exc
+
+    # --------------------------------------------------------
+    # Extract Gemini response
+    # --------------------------------------------------------
+
+    candidates = result.get("candidates", [])
+
+    if not candidates:
+        raise RuntimeError(
+            "Gemini returned no candidates:\n"
+            + json.dumps(
+                result,
+                indent=2
+            )[:2000]
+        )
+
+    parts = candidates[0].get(
+        "content",
+        {}
+    ).get(
+        "parts",
+        []
+    )
+
+    text_parts = []
+
+    for part in parts:
+
+        text = part.get("text")
+
+        if text:
+            text_parts.append(text)
+
+    text = "".join(text_parts).strip()
+
+    if not text:
+        raise RuntimeError(
+            "Gemini returned an empty response."
+        )
+
+    # --------------------------------------------------------
+    # Convert Gemini JSON string → Python dict
+    # --------------------------------------------------------
+
+    try:
+
+        structured_data = json.loads(text)
+
+    except json.JSONDecodeError as exc:
+
+        raise RuntimeError(
+            "Gemini returned invalid JSON:\n"
+            + text[:2000]
+        ) from exc
+
+    # --------------------------------------------------------
+    # Add processing metadata
+    # --------------------------------------------------------
+    structured_data["_metadata"] = {
+        "source_ocr_file": ocr_data.get("source_file"),
+        "model": model
+    }
+
+    return structured_data
+
+
+# ============================================================
+# CLI
+# ============================================================
+
+def main():
+
+    if len(sys.argv) < 2:
+
+        print(
+            "Usage: python3 normalizer.py "
+            "<ocr_json_path> [model]"
+        )
+
+        sys.exit(1)
+
+    json_path = sys.argv[1]
+
+    model = (
+        sys.argv[2]
+        if len(sys.argv) > 2
+        else DEFAULT_MODEL
+    )
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        ocr_data = json.load(f)
+
+    result = normalize(
+        ocr_data,
+        model
+    )
+
+    output_path = Path(json_path).with_name(
+        Path(json_path).stem + "_normalized.json"
+    )
+
+    with open(
+        output_path,
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        json.dump(
+            result,
+            f,
+            ensure_ascii=False,
+            indent=2
+        )
+
+    print("Normalization completed.")
+    print(f"JSON saved to: {output_path}")
+
+if __name__ == "__main__":
+    main()
